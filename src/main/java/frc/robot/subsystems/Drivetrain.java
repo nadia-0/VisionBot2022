@@ -54,6 +54,16 @@ public class Drivetrain extends SubsystemBase {
     drive.arcadeDrive(RobotContainer.leftJoy.getY(), -RobotContainer.rightJoy.getX());
   }
 
+  private double areaFinder(double area) {
+    return area*90; //THIS NUMBER IS COMPLETELY MADE UP IT DOESN'T MEAN ANYTHING (yet)
+  }
+
+  private double angleFinder(double y) {
+    double h1 = 4.5; //Limelight height
+    double h2 = 83.5; //HORIZONTAL ABOUT 15.45
+    return (h2-h1) / Math.tan(Math.toRadians(y));
+  }
+
   public void VisionPointer() {
     double x = tx.getDouble(0.0);
     double y = ty.getDouble(0.0);
@@ -76,9 +86,9 @@ public class Drivetrain extends SubsystemBase {
 
     // System.out.print(x);
     // System.out.print(y);
-    double h1 = 4.5; //Limelight height
-    double h2 = 83.5; //HORIZONTAL ABOUT 15.45
-    double dist = (h2-h1) / Math.tan(Math.toRadians(y));
+    double angleDist = angleFinder(y);
+    double areaDist = areaFinder(area);
+    double dist = (angleDist+areaDist)/2; //FIND AVERAGE BETWEEN TWO METHODS, MAY NEED LATER ADJUSTMENT
     SmartDashboard.putNumber("Distance to Target (ft)", dist/12);
     double desRotation = ((x - (30)) / (-30 - (30))) * (1 - -1) + (-1);
     // System.out.println("Desired roation: "+Double.toString(desRotation));
