@@ -76,7 +76,10 @@ public class Drivetrain extends SubsystemBase {
 
     // System.out.print(x);
     // System.out.print(y);
-
+    double h1 = 4.5; //Limelight height
+    double h2 = 83.5; //HORIZONTAL ABOUT 15.45
+    double dist = (h2-h1) / Math.tan(Math.toRadians(y));
+    SmartDashboard.putNumber("Distance to Target (ft)", dist/12);
     double desRotation = ((x - (30)) / (-30 - (30))) * (1 - -1) + (-1);
     // System.out.println("Desired roation: "+Double.toString(desRotation));
     drive.arcadeDrive(desRotation*.8, 0);
