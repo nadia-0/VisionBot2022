@@ -14,8 +14,10 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.commands.ManualDrive;
+import frc.robot.commands.TeleopDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import frc.robot.Constants;
 
 public class Drivetrain extends SubsystemBase {
   /* Creates a new Drivetrain. 
@@ -33,13 +35,10 @@ public class Drivetrain extends SubsystemBase {
   NetworkTableEntry ty = table.getEntry("ty");
   NetworkTableEntry ta = table.getEntry("ta");
 
-  double x;
-  double y;
+  public Drivetrain() {
 
-  public Drivetrain(int leftMtrID, int rightMtrID) {
-
-    leftMtr = new CANSparkMax(leftMtrID, MotorType.kBrushless);
-    rightMtr = new CANSparkMax(rightMtrID, MotorType.kBrushless);
+    leftMtr = new CANSparkMax(Constants.leftMtrID, MotorType.kBrushless);
+    rightMtr = new CANSparkMax(Constants.rightMtrID, MotorType.kBrushless);
     
     leftMtr.setInverted(true);
     rightMtr.setInverted(true);
@@ -50,18 +49,25 @@ public class Drivetrain extends SubsystemBase {
     // read values periodically
   }
 
-  public void ManualDrive() {
-    drive.arcadeDrive(RobotContainer.leftJoy.getY(), -RobotContainer.rightJoy.getX());
+  public void ManualDrive(double turnSpeed, double forwardSpeed) {
+    drive.arcadeDrive(turnSpeed, -forwardSpeed);
+  }
+
+  public void MotorOverride(double leftSpeed, double rightSpeed) {
+    leftMtr.set(leftSpeed);
+    rightMtr.set(-rightSpeed);
   }
 
   private double areaFinder(double area) {
-    return area*90; //THIS NUMBER IS COMPLETELY MADE UP IT DOESN'T MEAN ANYTHING (yet)
+    return (80*area)+(20*(area*area)); //THIS NUMBER IS COMPLETELY MADE UP IT DOESN'T MEAN ANYTHING (yet)
   }
 
   private double angleFinder(double y) {
-    double h1 = 4.5; //Limelight height
-    double h2 = 83.5; //HORIZONTAL ABOUT 15.45
-    return (h2-h1) / Math.tan(Math.toRadians(y));
+    double nativeAngle = 20; // Mounted angle of the limelight
+    double correction = -3; // Constant error
+    double h1 = 9; // Limelight height
+    double h2 = 61.5; // Target height
+    return (h2-h1) / Math.tan(Math.toRadians(nativeAngle+correction+y));
   }
 
   public void VisionPointer() {
@@ -69,29 +75,18 @@ public class Drivetrain extends SubsystemBase {
     double y = ty.getDouble(0.0);
     double area = ta.getDouble(0.0);
 
-    System.out.println(x);
-
     SmartDashboard.putNumber("LimelightX", x);
     SmartDashboard.putNumber("LimelightY", y);
     SmartDashboard.putNumber("LimelightArea", area);
 
-    if(x == -1 || y == -1) {
-      System.out.print("not found");
-      return;
-    } else if (Math.abs(x-120) <= 8) {
-      // drive.arcadeDrive(0, 0);
-      System.out.print("Ball centered");
-      return;
-    }
-
-    // System.out.print(x);
-    // System.out.print(y);
     double angleDist = angleFinder(y);
     double areaDist = areaFinder(area);
-    double dist = (angleDist+areaDist)/2; //FIND AVERAGE BETWEEN TWO METHODS, MAY NEED LATER ADJUSTMENT
+    double dist = angleDist;
+    //double dist = (angleDist+areaDist)/2; //FIND AVERAGE BETWEEN TWO METHODS, MAY NEED LATER ADJUSTMENT
     SmartDashboard.putNumber("Distance to Target (ft)", dist/12);
-    double desRotation = ((x - (30)) / (-30 - (30))) * (1 - -1) + (-1);
-    // System.out.println("Desired roation: "+Double.toString(desRotation));
+    double maxAngle = 30;
+    double desRotation = ((x - (maxAngle)) / (-maxAngle - (maxAngle))) * (1 - -1) + (-1);
+
     drive.arcadeDrive(desRotation*.8, 0);
   }
   @Override

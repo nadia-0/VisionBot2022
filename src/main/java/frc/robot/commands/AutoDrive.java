@@ -4,30 +4,29 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Robot;
-import frc.robot.subsystems.Drivetrain;
 
-public class VisionPointer extends CommandBase {
-  
-  public VisionPointer() {
+public class AutoDrive extends CommandBase {
+  /** Creates a new AutoDrive. */
+  double leftSpeed;
+  double rightSpeed;
+  public AutoDrive(double fs, double ts) {
     // Use addRequirements() here to declare subsystem dependencies.
+    leftSpeed = fs;
+    rightSpeed = ts;
+
     addRequirements(Robot.driveTrain);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Robot.driveTrain.VisionPointer();
+    Robot.driveTrain.MotorOverride(leftSpeed, rightSpeed);
   }
 
   // Called once the command ends or is interrupted.
@@ -37,6 +36,6 @@ public class VisionPointer extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }
