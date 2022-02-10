@@ -25,7 +25,7 @@ public class TeleopDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Robot.driveTrain.ManualDrive(Robot.m_robotContainer.rightJoy.getX(), Robot.m_robotContainer.leftJoy.getY());
+    Robot.driveTrain.ManualDrive(-Robot.m_robotContainer.leftJoy.getX(), Robot.m_robotContainer.rightJoy.getY());
   }
 
   // Called once the command ends or is interrupted.
